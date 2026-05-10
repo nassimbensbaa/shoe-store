@@ -7,34 +7,40 @@ function App() {
       name: "Nike Air Max",
       price: "12000 DA",
       img: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg",
+      originalPrice: "15000 DA",
+      discount: "20%",
     },
     {
       id: 2,
       name: "Adidas Run",
       price: "9500 DA",
       img: "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg",
+      originalPrice: "11000 DA",
+      discount: "14%",
     },
     {
       id: 3,
       name: "Puma Sport",
       price: "8000 DA",
       img: "https://images.pexels.com/photos/19090/pexels-photo.jpg",
+      originalPrice: "9500 DA",
+      discount: "16%",
     },
   ];
 
   const [selectedProduct, setSelectedProduct] = useState(null);
-
   const [form, setForm] = useState({
     name: "",
     lastname: "",
     wilaya: "",
     phone: "",
   });
-
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // 🚀 إرسال الطلب إلى API (آمن)
+  // 🚀 إرسال الطلب إلى API
   const sendOrder = async () => {
+    setLoading(true);
     try {
       const res = await fetch("/api/send", {
         method: "POST",
@@ -54,11 +60,14 @@ function App() {
 
       if (data.success) {
         setMessage("✅ تم إرسال الطلب بنجاح!");
+        setTimeout(() => setMessage(""), 3000);
       } else {
         setMessage("❌ حدث خطأ في الإرسال");
       }
     } catch (error) {
       setMessage("❌ مشكلة في الاتصال بالسيرفر");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -66,10 +75,14 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!form.name || !form.lastname || !form.wilaya || !form.phone) {
+      setMessage("⚠️ الرجاء تعبئة جميع الحقول");
+      return;
+    }
+
     await sendOrder();
 
     setSelectedProduct(null);
-
     setForm({
       name: "",
       lastname: "",
@@ -80,76 +93,128 @@ function App() {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>👟 متجر الأحذية</h1>
+      <div style={styles.header}>
+        <h1 style={styles.title}>
+          <span style={styles.titleIcon}>👟</span> 
+          متجر الأحذية الرياضية
+        </h1>
+        <p style={styles.subtitle}>أحدث التشكيلات بأفضل الأسعار</p>
+      </div>
 
-      {message && <p style={styles.message}>{message}</p>}
+      {message && (
+        <div style={message.includes("✅") ? styles.successMessage : styles.errorMessage}>
+          {message}
+        </div>
+      )}
 
       <div style={styles.grid}>
         {products.map((p) => (
           <div key={p.id} style={styles.card}>
+            {p.discount && <div style={styles.discountBadge}>{p.discount} خصم</div>}
             <img src={p.img} alt={p.name} style={styles.image} />
-            <h3>{p.name}</h3>
-            <p>{p.price}</p>
-
-            <button
-              style={styles.button}
-              onClick={() => setSelectedProduct(p)}
-            >
-              شراء الآن
-            </button>
+            <div style={styles.cardContent}>
+              <h3 style={styles.productName}>{p.name}</h3>
+              <div style={styles.priceContainer}>
+                <span style={styles.currentPrice}>{p.price}</span>
+                {p.originalPrice && (
+                  <span style={styles.originalPrice}>{p.originalPrice}</span>
+                )}
+              </div>
+              <button
+                style={styles.button}
+                onClick={() => setSelectedProduct(p)}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = "translateY(-2px)";
+                  e.target.style.boxShadow = "0 5px 15px rgba(0,0,0,0.3)";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = "translateY(0)";
+                  e.target.style.boxShadow = "none";
+                }}
+              >
+                شراء الآن 🛒
+              </button>
+            </div>
           </div>
         ))}
       </div>
 
       {/* نافذة الطلب */}
       {selectedProduct && (
-        <div style={styles.modal}>
-          <form onSubmit={handleSubmit} style={styles.form}>
-            <h3>طلب: {selectedProduct.name}</h3>
+        <div style={styles.modal} onClick={() => setSelectedProduct(null)}>
+          <form 
+            onSubmit={handleSubmit} 
+            style={styles.form}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={styles.modalHeader}>
+              <h3 style={styles.modalTitle}>طلب: {selectedProduct.name}</h3>
+              <button 
+                style={styles.closeButton}
+                onClick={() => setSelectedProduct(null)}
+                type="button"
+              >
+                ✕
+              </button>
+            </div>
 
             <input
+              style={styles.input}
               placeholder="الاسم"
               value={form.name}
-              onChange={(e) =>
-                setForm({ ...form, name: e.target.value })
-              }
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
               required
             />
 
             <input
+              style={styles.input}
               placeholder="اللقب"
               value={form.lastname}
-              onChange={(e) =>
-                setForm({ ...form, lastname: e.target.value })
-              }
+              onChange={(e) => setForm({ ...form, lastname: e.target.value })}
               required
             />
 
-            <input
-              placeholder="الولاية"
+            <select
+              style={styles.select}
               value={form.wilaya}
-              onChange={(e) =>
-                setForm({ ...form, wilaya: e.target.value })
-              }
+              onChange={(e) => setForm({ ...form, wilaya: e.target.value })}
               required
-            />
+            >
+              <option value="">اختر الولاية</option>
+              <option value="أدرار">أدرار</option>
+              <option value="الشلف">الشلف</option>
+              <option value="الأغواط">الأغواط</option>
+              <option value="الجزائر">الجزائر</option>
+              <option value="وهران">وهران</option>
+              <option value="قسنطينة">قسنطينة</option>
+              <option value="عنابة">عنابة</option>
+            </select>
 
             <input
+              style={styles.input}
               placeholder="رقم الهاتف"
+              type="tel"
               value={form.phone}
-              onChange={(e) =>
-                setForm({ ...form, phone: e.target.value })
-              }
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
               required
             />
 
-            <button type="submit">تأكيد الطلب</button>
-            <button
-              type="button"
-              onClick={() => setSelectedProduct(null)}
-            >
-              إلغاء
-            </button>
+            <div style={styles.modalButtons}>
+              <button 
+                type="submit" 
+                style={styles.confirmButton}
+                disabled={loading}
+              >
+                {loading ? "جاري الإرسال..." : "تأكيد الطلب"}
+              </button>
+              <button
+                type="button"
+                style={styles.cancelButton}
+                onClick={() => setSelectedProduct(null)}
+              >
+                إلغاء
+              </button>
+            </div>
           </form>
         </div>
       )}
@@ -157,45 +222,111 @@ function App() {
   );
 }
 
-// 🎨 تصميم
+// 🎨 تصميم متطور وعصري
 const styles = {
   container: {
-    fontFamily: "Arial",
+    fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
     textAlign: "center",
-    padding: 20,
-    background: "#f5f5f5",
+    padding: "20px",
+    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
     minHeight: "100vh",
   },
+  header: {
+    marginBottom: "40px",
+    padding: "20px",
+    background: "rgba(255, 255, 255, 0.1)",
+    borderRadius: "20px",
+    backdropFilter: "blur(10px)",
+  },
   title: {
-    marginBottom: 20,
+    fontSize: "2.5rem",
+    color: "white",
+    marginBottom: "10px",
+    textShadow: "2px 2px 4px rgba(0,0,0,0.2)",
+  },
+  titleIcon: {
+    marginLeft: "10px",
+  },
+  subtitle: {
+    color: "rgba(255, 255, 255, 0.9)",
+    fontSize: "1.1rem",
   },
   grid: {
-    display: "flex",
-    gap: 20,
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+    gap: "30px",
     justifyContent: "center",
-    flexWrap: "wrap",
+    maxWidth: "1200px",
+    margin: "0 auto",
+    padding: "20px",
   },
   card: {
-    width: 220,
+    position: "relative",
     background: "white",
-    borderRadius: 12,
-    padding: 15,
-    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+    borderRadius: "20px",
+    overflow: "hidden",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+    transition: "transform 0.3s ease, box-shadow 0.3s ease",
+    cursor: "pointer",
+  },
+  cardHover: {
+    transform: "translateY(-10px)",
+    boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
+  },
+  discountBadge: {
+    position: "absolute",
+    top: "15px",
+    right: "15px",
+    background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+    color: "white",
+    padding: "5px 12px",
+    borderRadius: "20px",
+    fontSize: "0.8rem",
+    fontWeight: "bold",
+    zIndex: 1,
+    boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
   },
   image: {
     width: "100%",
-    height: 150,
+    height: "220px",
     objectFit: "cover",
-    borderRadius: 10,
+    transition: "transform 0.3s ease",
+  },
+  cardContent: {
+    padding: "20px",
+  },
+  productName: {
+    fontSize: "1.3rem",
+    color: "#333",
+    marginBottom: "10px",
+  },
+  priceContainer: {
+    display: "flex",
+    justifyContent: "center",
+    gap: "10px",
+    marginBottom: "15px",
+  },
+  currentPrice: {
+    fontSize: "1.2rem",
+    color: "#667eea",
+    fontWeight: "bold",
+  },
+  originalPrice: {
+    fontSize: "0.9rem",
+    color: "#999",
+    textDecoration: "line-through",
   },
   button: {
-    marginTop: 10,
-    padding: "8px 12px",
-    background: "black",
+    width: "100%",
+    padding: "12px",
+    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
     color: "white",
     border: "none",
+    borderRadius: "10px",
+    fontSize: "1rem",
+    fontWeight: "bold",
     cursor: "pointer",
-    borderRadius: 6,
+    transition: "all 0.3s ease",
   },
   modal: {
     position: "fixed",
@@ -203,24 +334,174 @@ const styles = {
     left: 0,
     width: "100%",
     height: "100%",
-    background: "rgba(0,0,0,0.6)",
+    background: "rgba(0,0,0,0.8)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 1000,
+    animation: "fadeIn 0.3s ease",
   },
   form: {
-    background: "white",
-    padding: 20,
-    borderRadius: 10,
+    background: "linear-gradient(135deg, #fff 0%, #f8f9fa 100%)",
+    padding: "30px",
+    borderRadius: "20px",
     display: "flex",
     flexDirection: "column",
-    gap: 10,
-    width: 300,
+    gap: "15px",
+    width: "90%",
+    maxWidth: "400px",
+    boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+    animation: "slideUp 0.3s ease",
   },
-  message: {
-    color: "green",
+  modalHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "10px",
+  },
+  modalTitle: {
+    fontSize: "1.5rem",
+    color: "#333",
+    margin: 0,
+  },
+  closeButton: {
+    background: "none",
+    border: "none",
+    fontSize: "1.5rem",
+    cursor: "pointer",
+    color: "#999",
+    transition: "color 0.3s ease",
+  },
+  input: {
+    padding: "12px",
+    fontSize: "1rem",
+    border: "2px solid #e0e0e0",
+    borderRadius: "10px",
+    transition: "border-color 0.3s ease",
+    outline: "none",
+    fontFamily: "inherit",
+  },
+  select: {
+    padding: "12px",
+    fontSize: "1rem",
+    border: "2px solid #e0e0e0",
+    borderRadius: "10px",
+    transition: "border-color 0.3s ease",
+    outline: "none",
+    fontFamily: "inherit",
+    background: "white",
+  },
+  modalButtons: {
+    display: "flex",
+    gap: "10px",
+    marginTop: "10px",
+  },
+  confirmButton: {
+    flex: 1,
+    padding: "12px",
+    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+    color: "white",
+    border: "none",
+    borderRadius: "10px",
+    fontSize: "1rem",
     fontWeight: "bold",
+    cursor: "pointer",
+    transition: "transform 0.2s ease",
+  },
+  cancelButton: {
+    flex: 1,
+    padding: "12px",
+    background: "#f0f0f0",
+    color: "#666",
+    border: "none",
+    borderRadius: "10px",
+    fontSize: "1rem",
+    cursor: "pointer",
+    transition: "background 0.3s ease",
+  },
+  successMessage: {
+    background: "#4caf50",
+    color: "white",
+    padding: "12px",
+    borderRadius: "10px",
+    marginBottom: "20px",
+    maxWidth: "400px",
+    margin: "0 auto 20px auto",
+    animation: "slideDown 0.3s ease",
+  },
+  errorMessage: {
+    background: "#f44336",
+    color: "white",
+    padding: "12px",
+    borderRadius: "10px",
+    marginBottom: "20px",
+    maxWidth: "400px",
+    margin: "0 auto 20px auto",
+    animation: "slideDown 0.3s ease",
   },
 };
+
+// إضافة CSS للحركات
+const styleSheet = document.createElement("style");
+styleSheet.textContent = `
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideUp {
+    from {
+      transform: translateY(50px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideDown {
+    from {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  div[style*="card"]:hover img {
+    transform: scale(1.05);
+  }
+  
+  div[style*="card"]:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  }
+  
+  input:focus, select:focus {
+    border-color: #667eea !important;
+  }
+  
+  button[type="submit"]:hover, .confirmButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+  }
+  
+  .cancelButton:hover {
+    background: #e0e0e0;
+  }
+  
+  .closeButton:hover {
+    color: #333;
+    transform: scale(1.1);
+  }
+`;
+document.head.appendChild(styleSheet);
 
 export default App;
