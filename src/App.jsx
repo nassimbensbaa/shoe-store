@@ -23,14 +23,28 @@ function App() {
   ];
 
   const [selectedProduct, setSelectedProduct] = useState(null);
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+
+=======
+>>>>>>> ecf7ed374b11804e17557b5801e74eef999be733
+>>>>>>> fddae2a80adb73acb37d005fa9a665a299d72f46
   const [form, setForm] = useState({
     name: "",
     lastname: "",
     wilaya: "",
     phone: "",
   });
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+
+=======
+>>>>>>> ecf7ed374b11804e17557b5801e74eef999be733
+>>>>>>> fddae2a80adb73acb37d005fa9a665a299d72f46
   const [message, setMessage] = useState("");
 
   // 🚀 إرسال الطلب إلى API (آمن)
