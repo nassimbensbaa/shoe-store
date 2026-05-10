@@ -23,12 +23,14 @@ function App() {
   ];
 
   const [selectedProduct, setSelectedProduct] = useState(null);
+
   const [form, setForm] = useState({
     name: "",
     lastname: "",
     wilaya: "",
     phone: "",
   });
+
   const [message, setMessage] = useState("");
 
   // 🚀 إرسال الطلب إلى API (آمن)
