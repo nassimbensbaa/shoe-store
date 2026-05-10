@@ -23,14 +23,20 @@ function App() {
   ];
 
   const [selectedProduct, setSelectedProduct] = useState(null);
+<<<<<<< HEAD
 
+=======
+>>>>>>> ecf7ed374b11804e17557b5801e74eef999be733
   const [form, setForm] = useState({
     name: "",
     lastname: "",
     wilaya: "",
     phone: "",
   });
+<<<<<<< HEAD
 
+=======
+>>>>>>> ecf7ed374b11804e17557b5801e74eef999be733
   const [message, setMessage] = useState("");
 
   // 🚀 إرسال الطلب إلى API (آمن)
