@@ -5,26 +5,20 @@ function App() {
     {
       id: 1,
       name: "Nike Air Max",
-      price: "1000 DA",
+      price: "12000 DA",
       img: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg",
-      originalPrice: "200 DA",
-      discount: "20%",
     },
     {
       id: 2,
       name: "Adidas Run",
-      price: "500 DA",
+      price: "9500 DA",
       img: "https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg",
-      originalPrice: "1000 DA",
-      discount: "14%",
     },
     {
       id: 3,
       name: "Puma Sport",
-      price: "800 DA",
+      price: "8000 DA",
       img: "https://images.pexels.com/photos/19090/pexels-photo.jpg",
-      originalPrice: "500 DA",
-      discount: "16%",
     },
   ];
 
@@ -38,7 +32,7 @@ function App() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // 🚀 إرسال الطلب إلى API
+  // 🚀 إرسال الطلب إلى API (نفس الكود القديم الذي يعمل)
   const sendOrder = async () => {
     setLoading(true);
     try {
@@ -71,17 +65,10 @@ function App() {
     }
   };
 
-  // 🛒 عند تأكيد الطلب
+  // 🛒 عند تأكيد الطلب (نفس الكود القديم)
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!form.name || !form.lastname || !form.wilaya || !form.phone) {
-      setMessage("⚠️ الرجاء تعبئة جميع الحقول");
-      return;
-    }
-
     await sendOrder();
-
     setSelectedProduct(null);
     setForm({
       name: "",
@@ -110,27 +97,13 @@ function App() {
       <div style={styles.grid}>
         {products.map((p) => (
           <div key={p.id} style={styles.card}>
-            {p.discount && <div style={styles.discountBadge}>{p.discount} خصم</div>}
             <img src={p.img} alt={p.name} style={styles.image} />
             <div style={styles.cardContent}>
               <h3 style={styles.productName}>{p.name}</h3>
-              <div style={styles.priceContainer}>
-                <span style={styles.currentPrice}>{p.price}</span>
-                {p.originalPrice && (
-                  <span style={styles.originalPrice}>{p.originalPrice}</span>
-                )}
-              </div>
+              <p style={styles.currentPrice}>{p.price}</p>
               <button
                 style={styles.button}
                 onClick={() => setSelectedProduct(p)}
-                onMouseEnter={(e) => {
-                  e.target.style.transform = "translateY(-2px)";
-                  e.target.style.boxShadow = "0 5px 15px rgba(0,0,0,0.3)";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.transform = "translateY(0)";
-                  e.target.style.boxShadow = "none";
-                }}
               >
                 شراء الآن 🛒
               </button>
@@ -139,7 +112,7 @@ function App() {
         ))}
       </div>
 
-      {/* نافذة الطلب */}
+      {/* نافذة الطلب - نفس الشكل القديم مع تصميم جديد */}
       {selectedProduct && (
         <div style={styles.modal} onClick={() => setSelectedProduct(null)}>
           <form 
@@ -174,37 +147,24 @@ function App() {
               required
             />
 
-            <select
-              style={styles.select}
+            <input
+              style={styles.input}
+              placeholder="الولاية"
               value={form.wilaya}
               onChange={(e) => setForm({ ...form, wilaya: e.target.value })}
               required
-            >
-              <option value="">اختر الولاية</option>
-              <option value="أدرار">أدرار</option>
-              <option value="الشلف">الشلف</option>
-              <option value="الأغواط">الأغواط</option>
-              <option value="الجزائر">الجزائر</option>
-              <option value="وهران">وهران</option>
-              <option value="قسنطينة">قسنطينة</option>
-              <option value="عنابة">عنابة</option>
-            </select>
+            />
 
             <input
               style={styles.input}
               placeholder="رقم الهاتف"
-              type="tel"
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
               required
             />
 
             <div style={styles.modalButtons}>
-              <button 
-                type="submit" 
-                style={styles.confirmButton}
-                disabled={loading}
-              >
+              <button type="submit" style={styles.confirmButton} disabled={loading}>
                 {loading ? "جاري الإرسال..." : "تأكيد الطلب"}
               </button>
               <button
@@ -222,7 +182,7 @@ function App() {
   );
 }
 
-// 🎨 تصميم متطور وعصري
+// 🎨 تصميم جديد مع الحفاظ على نفس طريقة العمل
 const styles = {
   container: {
     fontFamily: "'Cairo', 'Tajawal', 'Arial', sans-serif",
@@ -261,30 +221,12 @@ const styles = {
     padding: "20px",
   },
   card: {
-    position: "relative",
     background: "white",
     borderRadius: "20px",
     overflow: "hidden",
     boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
     transition: "transform 0.3s ease, box-shadow 0.3s ease",
     cursor: "pointer",
-  },
-  cardHover: {
-    transform: "translateY(-10px)",
-    boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
-  },
-  discountBadge: {
-    position: "absolute",
-    top: "15px",
-    right: "15px",
-    background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-    color: "white",
-    padding: "5px 12px",
-    borderRadius: "20px",
-    fontSize: "0.8rem",
-    fontWeight: "bold",
-    zIndex: 1,
-    boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
   },
   image: {
     width: "100%",
@@ -300,21 +242,11 @@ const styles = {
     color: "#333",
     marginBottom: "10px",
   },
-  priceContainer: {
-    display: "flex",
-    justifyContent: "center",
-    gap: "10px",
-    marginBottom: "15px",
-  },
   currentPrice: {
     fontSize: "1.2rem",
     color: "#667eea",
     fontWeight: "bold",
-  },
-  originalPrice: {
-    fontSize: "0.9rem",
-    color: "#999",
-    textDecoration: "line-through",
+    marginBottom: "15px",
   },
   button: {
     width: "100%",
@@ -339,7 +271,6 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     zIndex: 1000,
-    animation: "fadeIn 0.3s ease",
   },
   form: {
     background: "linear-gradient(135deg, #fff 0%, #f8f9fa 100%)",
@@ -351,7 +282,6 @@ const styles = {
     width: "90%",
     maxWidth: "400px",
     boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
-    animation: "slideUp 0.3s ease",
   },
   modalHeader: {
     display: "flex",
@@ -370,26 +300,14 @@ const styles = {
     fontSize: "1.5rem",
     cursor: "pointer",
     color: "#999",
-    transition: "color 0.3s ease",
   },
   input: {
     padding: "12px",
     fontSize: "1rem",
     border: "2px solid #e0e0e0",
     borderRadius: "10px",
-    transition: "border-color 0.3s ease",
     outline: "none",
     fontFamily: "inherit",
-  },
-  select: {
-    padding: "12px",
-    fontSize: "1rem",
-    border: "2px solid #e0e0e0",
-    borderRadius: "10px",
-    transition: "border-color 0.3s ease",
-    outline: "none",
-    fontFamily: "inherit",
-    background: "white",
   },
   modalButtons: {
     display: "flex",
@@ -406,7 +324,6 @@ const styles = {
     fontSize: "1rem",
     fontWeight: "bold",
     cursor: "pointer",
-    transition: "transform 0.2s ease",
   },
   cancelButton: {
     flex: 1,
@@ -417,7 +334,6 @@ const styles = {
     borderRadius: "10px",
     fontSize: "1rem",
     cursor: "pointer",
-    transition: "background 0.3s ease",
   },
   successMessage: {
     background: "#4caf50",
@@ -427,7 +343,6 @@ const styles = {
     marginBottom: "20px",
     maxWidth: "400px",
     margin: "0 auto 20px auto",
-    animation: "slideDown 0.3s ease",
   },
   errorMessage: {
     background: "#f44336",
@@ -437,69 +352,28 @@ const styles = {
     marginBottom: "20px",
     maxWidth: "400px",
     margin: "0 auto 20px auto",
-    animation: "slideDown 0.3s ease",
   },
 };
 
-// إضافة CSS للحركات
+// إضافة تأثيرات CSS
 const styleSheet = document.createElement("style");
 styleSheet.textContent = `
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-  
-  @keyframes slideUp {
-    from {
-      transform: translateY(50px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-  
-  @keyframes slideDown {
-    from {
-      transform: translateY(-20px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
+  div[style*="card"]:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
   }
   
   div[style*="card"]:hover img {
     transform: scale(1.05);
   }
   
-  div[style*="card"]:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-  }
-  
-  input:focus, select:focus {
-    border-color: #667eea !important;
-  }
-  
-  button[type="submit"]:hover, .confirmButton:hover {
+  button[type="submit"]:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
   }
   
-  .cancelButton:hover {
-    background: #e0e0e0;
-  }
-  
-  .closeButton:hover {
-    color: #333;
-    transform: scale(1.1);
+  input:focus {
+    border-color: #667eea !important;
   }
 `;
 document.head.appendChild(styleSheet);
